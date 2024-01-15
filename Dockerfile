@@ -6,8 +6,8 @@ LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docke
       org.label-schema.docker.cmd="docker-compose up -d" \
       maintainer="Giovanni Torres"
 
-ARG SLURM_TAG=slurm-21-08-6-1
-ARG GOSU_VERSION=1.11
+ARG SLURM_TAG=slurm-23.11
+ARG GOSU_VERSION=1.17
 
 RUN set -ex \
     && yum makecache \
@@ -25,9 +25,9 @@ RUN set -ex \
        make \
        munge \
        munge-devel \
-       python3-devel \
-       python3-pip \
-       python3 \
+    #    python3-devel \
+    #    python3-pip \
+    #    python3 \
        mariadb-server \
        mariadb-devel \
        psmisc \
@@ -35,12 +35,29 @@ RUN set -ex \
        vim-enhanced \
        http-parser-devel \
        json-c-devel \
+       zlib zlib-devel \
+       libffi-devel \
+       bzip2-devel readline readline-devel sqlite sqlite-devel openssl openssl-devel \
+    && dnf -y install xz \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-RUN alternatives --set python /usr/bin/python3
+# Install pyenv
+RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+# Add pyenv settings to bashrc
+RUN echo '' >> ~/.bashrc
+RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+RUN echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+# Download and install Python 3.10.12
+RUN bash -c "pyenv install 3.10.12"
+RUN bash -c "pyenv global 3.10.12"
+# Set environment variables
+ENV PYENV_ROOT=/root/.pyenv
+ENV PATH=$PYENV_ROOT/bin:$PATH
 
-RUN pip3 install Cython nose
+RUN pip install Cython nose
+RUN pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
 
 RUN set -ex \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64" \
