@@ -30,9 +30,9 @@ RUN set -ex \
        make \
        munge \
        munge-devel \
-       python3-devel \
-       python3-pip \
-       python3 \
+    #    python3-devel \
+    #    python3-pip \
+    #    python3 \
        mariadb-server \
        mariadb-devel \
        psmisc \
