@@ -1,4 +1,5 @@
 FROM rockylinux:8
+SHELL ["/bin/bash", "-l", "-c"] 
 
 LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docker-cluster" \
       org.opencontainers.image.title="slurm-docker-cluster" \
@@ -6,8 +7,12 @@ LABEL org.opencontainers.image.source="https://github.com/giovtorres/slurm-docke
       org.label-schema.docker.cmd="docker-compose up -d" \
       maintainer="Giovanni Torres"
 
-ARG SLURM_TAG=slurm-23.11
-ARG GOSU_VERSION=1.17
+# ARG SLURM_TAG=slurm-23.11
+# ARG GOSU_VERSION=1.17
+
+ARG SLURM_TAG=slurm-21-08-6-1
+ARG GOSU_VERSION=1.11
+
 
 RUN set -ex \
     && yum makecache \
@@ -25,9 +30,9 @@ RUN set -ex \
        make \
        munge \
        munge-devel \
-    #    python3-devel \
-    #    python3-pip \
-    #    python3 \
+       python3-devel \
+       python3-pip \
+       python3 \
        mariadb-server \
        mariadb-devel \
        psmisc \
